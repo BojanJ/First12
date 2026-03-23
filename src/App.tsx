@@ -7,6 +7,7 @@ import { OnboardingPage } from './pages/OnboardingPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { EventDetailPage } from './pages/EventDetailPage'
 import { AdminPage } from './pages/AdminPage'
+import { SettingsPage } from './pages/SettingsPage'
 import { Layout } from './components/Layout'
 
 function App() {
@@ -67,6 +68,10 @@ function App() {
         <Route path="/" element={<Layout profile={profile} />}>
           <Route index element={<DashboardPage />} />
           <Route path="events/:id" element={<EventDetailPage profile={profile} />} />
+          <Route
+            path="settings"
+            element={<SettingsPage profile={profile} onProfileUpdate={setProfile} />}
+          />
           <Route
             path="admin"
             element={
