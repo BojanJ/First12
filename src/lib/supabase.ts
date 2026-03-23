@@ -14,6 +14,9 @@ export type Profile = {
   nickname: string
   role: 'admin' | 'user'
   push_token: string | null
+  notifications_enabled: boolean
+  notify_on_created: boolean
+  notify_on_opened: boolean
   created_at: string
 }
 

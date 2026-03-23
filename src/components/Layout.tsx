@@ -1,5 +1,6 @@
 import { Outlet, Link, useNavigate } from 'react-router-dom'
 import { supabase, type Profile } from '../lib/supabase'
+import { InstallBanner } from './InstallBanner'
 
 interface LayoutProps {
   profile: Profile
@@ -15,6 +16,7 @@ export function Layout({ profile }: LayoutProps) {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <InstallBanner />
       <header className="bg-green-600 text-white shadow-md">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center gap-2 font-bold text-xl">
@@ -26,6 +28,9 @@ export function Layout({ profile }: LayoutProps) {
                 Admin Panel
               </Link>
             )}
+            <Link to="/settings" className="text-green-100 hover:text-white transition-colors text-sm font-medium">
+              Settings
+            </Link>
             <span className="text-green-200 text-sm">
               {profile.nickname}
             </span>
