@@ -67,15 +67,14 @@ as $$
 declare
   v_max int;
   v_count int;
-  v_event_id uuid;
 begin
-  -- Get event max_attendees
-  select max_attendees into v_max from public.events where id = p_event_id;
+  -- Lock the event row to prevent race conditions
+  select max_attendees into v_max from public.events where id = p_event_id for update;
   if not found then
     return json_build_object('success', false, 'error', 'Event not found');
   end if;
 
-  -- Count current attendees with lock
+  -- Count current attendees
   select count(*) into v_count from public.attendances where event_id = p_event_id;
 
   if v_count >= v_max then
