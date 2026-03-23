@@ -32,15 +32,18 @@ export function EventDetailPage({ profile }: EventDetailPageProps) {
 
     setEvent(eventData)
 
+    type AttendanceRow = { profiles: Pick<Profile, 'id' | 'nickname'> | null }
+
     const { data: attendancesData } = await supabase
       .from('attendances')
       .select('user_id, profiles(id, nickname)')
       .eq('event_id', id)
       .order('created_at', { ascending: true })
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const profiles: Profile[] = (attendancesData ?? []).map((a: any) => a.profiles).filter(Boolean)
-    setAttendees(profiles)
+    const profiles = ((attendancesData ?? []) as unknown as AttendanceRow[])
+      .map((a) => a.profiles)
+      .filter((p): p is Pick<Profile, 'id' | 'nickname'> => p !== null)
+    setAttendees(profiles as Profile[])
     setAttending(profiles.some((p) => p.id === profile.id))
     setLoading(false)
   }

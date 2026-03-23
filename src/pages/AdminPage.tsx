@@ -50,7 +50,10 @@ export function AdminPage() {
     }
   }
 
-  useEffect(() => { fetchEvents() }, [])
+  useEffect(() => {
+    const load = async () => { await fetchEvents() }
+    load()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

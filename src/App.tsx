@@ -27,21 +27,22 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (!session) {
-      setProfile(null)
-      setLoading(false)
-      return
-    }
-
-    supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', session.user.id)
-      .single()
-      .then(({ data }) => {
-        setProfile(data)
+    const loadProfile = async () => {
+      if (!session) {
+        setProfile(null)
         setLoading(false)
-      })
+        return
+      }
+
+      const { data } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', session.user.id)
+        .single()
+      setProfile(data)
+      setLoading(false)
+    }
+    loadProfile()
   }, [session])
 
   if (loading) {

@@ -59,7 +59,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          from: "Soccer Scheduler <noreply@yourdomain.com>",
+          from: Deno.env.get("EMAIL_FROM_ADDRESS") ?? "Soccer Scheduler <noreply@yourdomain.com>",
           to: user.email,
           subject: message,
           html: `<p>${message}</p><p>Location: ${event.location}</p>`,
