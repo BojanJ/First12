@@ -103,9 +103,27 @@ export function AdminPage() {
         }
       }
 
-      const { error } = await supabase.from('events').insert(eventsToCreate)
+      const { data: newEvents, error } = await supabase
+        .from('events')
+        .insert(eventsToCreate)
+        .select()
+      
       if (error) { setMessage(error.message); setLoading(false); return }
+      
       setMessage(`${eventsToCreate.length} event(s) created!`)
+
+      // Send notifications for each new event
+      if (newEvents) {
+        for (const event of newEvents) {
+          try {
+            await supabase.functions.invoke('notify-event', {
+              body: { event_id: event.id, type: 'new_event' }
+            })
+          } catch (e) {
+            console.error('Failed to send notification:', e)
+          }
+        }
+      }
     }
 
     setForm(defaultForm)
@@ -141,18 +159,35 @@ export function AdminPage() {
     regOpens.setDate(regOpens.getDate() + 7)
 
     const { data: { user } } = await supabase.auth.getUser()
-    const { error } = await supabase.from('events').insert({
-      title: event.title,
-      location: event.location,
-      starts_at: startsAt.toISOString(),
-      registration_opens_at: regOpens.toISOString(),
-      max_attendees: event.max_attendees,
-      is_recurring: event.is_recurring,
-      created_by: user?.id,
-    })
+    const { data: newEvent, error } = await supabase
+      .from('events')
+      .insert({
+        title: event.title,
+        location: event.location,
+        starts_at: startsAt.toISOString(),
+        registration_opens_at: regOpens.toISOString(),
+        max_attendees: event.max_attendees,
+        is_recurring: event.is_recurring,
+        created_by: user?.id,
+      })
+      .select()
+      .single()
 
     if (error) { setMessage(error.message); return }
+    
     setMessage('Event cloned to next week!')
+    
+    // Send notification for the cloned event
+    if (newEvent) {
+      try {
+        await supabase.functions.invoke('notify-event', {
+          body: { event_id: newEvent.id, type: 'new_event' }
+        })
+      } catch (e) {
+        console.error('Failed to send notification:', e)
+      }
+    }
+    
     fetchEvents()
   }
 

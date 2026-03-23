@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase, type Profile } from '../lib/supabase'
+import { registerPushSubscription } from '../lib/notifications'
 
 interface OnboardingPageProps {
   userId: string
@@ -29,6 +30,11 @@ export function OnboardingPage({ userId, onComplete }: OnboardingPageProps) {
       setLoading(false)
       return
     }
+
+    // Register for push notifications (optional, won't block onboarding)
+    registerPushSubscription().catch(err => 
+      console.log('Push subscription failed, but continuing:', err)
+    )
 
     onComplete(data as Profile)
   }

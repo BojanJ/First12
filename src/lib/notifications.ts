@@ -1,3 +1,5 @@
+import { supabase } from './supabase'
+
 export async function registerPushSubscription(): Promise<PushSubscription | null> {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
     console.log('Push notifications not supported')
@@ -20,6 +22,21 @@ export async function registerPushSubscription(): Promise<PushSubscription | nul
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
     })
+
+    // Save the subscription to the user's profile
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { error } = await supabase
+        .from('profiles')
+        .update({ push_token: JSON.stringify(subscription) })
+        .eq('id', user.id)
+      
+      if (error) {
+        console.error('Failed to save push token:', error)
+      } else {
+        console.log('Push subscription saved to profile!')
+      }
+    }
 
     return subscription
   } catch (e) {
